@@ -8,7 +8,7 @@
   <meta name="description" content="Description">
   <meta name="viewport"
     content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/lib/themes/vue.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/lib/themes/vue.css">
 </head>
 
 <body>
@@ -21,14 +21,32 @@
       maxlLevel: 3,     // 目录层级
       subMaxLevel: 3,   // 子页面目录层级
       // loadNavbar: true, // 导航栏
-      loadSidebar:true, // 显示侧边栏
-      alias:{
-        '/.*/_sidebar.md':'/_sidebar.md'
+      loadSidebar: true, // 显示侧边栏
+      alias: {
+        '/.*/_sidebar.md': '/_sidebar.md'
       },
+
+      // 搜索
+      search: {
+        maxAge: 86400000, // 过期时间，单位毫秒，默认一天
+        paths: [], // or 'auto'
+        placeholder: '搜索',
+        noData: '未知结果',
+
+        // 搜索标题的最大层级, 1 - 6
+        depth: 2,
+      },
+
+      ga: 'UA-XXXXX-Y'
+
 
     }
   </script>
   <script src="//cdn.jsdelivr.net/npm/docsify/lib/docsify.min.js"></script>
+  <!-- 全文搜索 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+  <!-- 谷歌统计 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/ga.min.js"></script>
 </body>
 
 </html>
