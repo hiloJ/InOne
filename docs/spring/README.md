@@ -333,3 +333,7 @@ IOC容器初始化分为三个过程实现：
 2. BeanDefinition的载入，是把用户定义好的Bean表示成IOC容器内部的数据结构(BeanDefinition)
 3. 向IOC容器中注册这些BeanDefinition的过程，是将第二步的BeanDefinition保存到HashMap中
 
+### 循环依赖
+
+#### 什么是循环依赖
+
