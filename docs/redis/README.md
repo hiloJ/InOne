@@ -1,6 +1,6 @@
 ## Redis
 
-> Reids是一个开源的内存数据库，可以用作数据库、缓存和消息中间件
+> `Reids`是一个开源的内存数据库，可以用作数据库、缓存和消息中间件
 >
 > 它支持多种类型的数据结构（如：`字符串(strings)`、`散列(hashes)`、`列表(lists)`、`集合(sets)`、`有序集合(sorted sets)`）与范围查询（如：`bitmaps`、`hyperloglogs`、`geospatial`）。
 >
