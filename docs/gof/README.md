@@ -446,10 +446,561 @@ public class Student implements Serializable {
 >
 > **`工厂模式`**在简单工厂模式的基础上**增加了选择工厂的维度**，需要第一步选择合适的工厂
 >
-> **`抽象工厂模式`**有产品族的概念，如果各个产品是存在兼容性问题的，就要用抽象工厂模式
+> **`抽象工厂模式`**有**产品族**的概念，如果各个产品是存在兼容性问题的，就要用抽象工厂模式
 >
 > **`单例模式`**为了保证全局使用的是同一对象，一方面是安全性考虑，一方面是为了节省资源
 >
-> **`建造者模式`**专门对付属性很多的那种类，为了让代码更优美
+> **`建造者模式`**专门对付**属性很多的那种类**，为了让代码更优美
 >
 > **`原型模式`**了解 Object 类中的 clone() 方法相关的知识即可。
+
+## 7种结构型模式
+
+### 7.1 适配器模式
+
+> 将不相关的类转换成需要的类
+
+#### 7.1.1 默认适配器模式
+
+> 避免无关接口方法的实现
+
+![K0vPC8.png](https://s2.ax1x.com/2019/10/26/K0vPC8.png)
+
+~~~java
+// 定义接口
+public interface DefaultAdapter {
+    public void testOne();
+    public void testTwo();
+    public void testThree();
+}
+
+// 默认接口实现类
+public class DefaultAdapterImpl implements DefaultAdapter {
+    public void testOne() {}
+
+    public void testTwo() {}
+
+    public void testThree() {}
+}
+
+// 需要使用的类,仅重写部分方法
+public class Target extends DefaultAdapterImpl {
+    @Override
+    public void testTwo() {
+        System.out.println("我只需要重写testTwo方法");
+    }
+}
+~~~
+
+#### 7.1.2 对象适配器模式
+
+> 旧的对象为内核，新的对象为外壳
+
+![K0xERO.png](https://s2.ax1x.com/2019/10/26/K0xERO.png)
+
+~~~java
+// 客户端请求对象
+public interface Target {
+    public void say();
+}
+
+//  旧的对象
+public class Dog {
+    public void say(){
+        System.out.println("汪汪汪");
+    }
+}
+
+//  新的的对象
+public class Cat implements Target {
+    private Dog dog;
+    public Cat(Dog dog){this.dog = dog;}
+    public void say() {
+        dog.say();
+    }
+}
+
+// 客户端调用
+public class Client {
+    public static void main(String[] args) {
+        Dog dog = new Dog();
+        Target target = new Cat(dog);
+        target.say();
+    }
+}
+~~~
+
+#### 7.1.3 类适配器模式
+
+> 在旧类的基础上扩展出新的需要的类
+
+![K0zlnJ.png](https://s2.ax1x.com/2019/10/26/K0zlnJ.png)
+
+~~~java
+//  定义接口
+public interface AdapteeInter {
+    public void eat();
+}
+
+//  现有的类
+public class Adapteeobj {
+    public void run(){
+        System.out.println("我会跑");
+    }
+
+    public void sleep(){
+        System.out.println("我会睡");
+    }
+}
+
+//  需要的新的类
+public class Adapter extends Adapteeobj implements AdapteeInter {
+    public void eat() {
+        System.out.println("我会吃");
+    }
+}
+
+// 客户端调用
+public class Client {
+    public static void main(String[] args) {
+        Adapter adapter = new Adapter();
+        adapter.eat();
+        adapter.run();
+        adapter.sleep();
+    }
+}
+~~~
+
+### 7.2 桥接模式
+
+> 将类与类之间继承的关系，变成`抽象类`或者`接口与接口`之间的关联关系，实现抽象化与实现化的解耦
+
+![KXcDoV.md.png](https://s2.ax1x.com/2019/11/03/KXcDoV.md.png)
+
+~~~java
+// 定义颜色接口,充当桥梁
+public interface Color {
+    void paint(String penType, String name);
+}
+
+// 接口的子类实现
+public class Blue implements Color {
+    public void paint(String penType, String name) {
+        System.out.println(penType + "画蓝色的" + name);
+    }
+}
+
+public class Red implements Color {
+    public void paint(String penType, String name) {
+        System.out.println(penType + "画红色的" + name);
+    }
+}
+
+// 定义抽象类,持有接口的引用
+public abstract class AbstracePen {
+    // 持有接口的引用
+    protected Color color;
+    protected void setColor(Color color){this.color = color;}
+    public abstract void draw(String name);
+}
+
+// 抽象类实现,重写的方法底层是借助于桥梁接口的子类
+public class BigPen extends AbstracePen {
+    public void draw(String name) {
+        String penType = "大号笔";
+        this.color.paint(penType,name);
+    }
+}
+
+public class SmallPen extends AbstracePen {
+    public void draw(String name) {
+        String penType = "小号笔";
+        this.color.paint(penType,name);
+    }
+}
+
+// 客户端调用
+public class Client {
+    public static void main(String[] args) {
+        Red red = new Red();
+        BigPen bigPen = new BigPen();
+
+        bigPen.setColor(red);
+        bigPen.draw("鲜花");
+    }
+}
+~~~
+
+### 7.3 组合模式
+
+> 将一组相似的对象(具有层次结构的数据)当作一个单一的对象
+
+~~~java
+public class Emplayee {
+    private String name;
+    private String phoneNum;
+    // 下属集合
+    private List<Emplayee> emplayees;
+
+    public Emplayee(String name, String phoneNum) {
+        this.name = name;
+        this.phoneNum = phoneNum;
+        emplayees = new ArrayList<Emplayee>();
+    }
+
+    public void add(Emplayee emplayee){
+        this.emplayees.add(emplayee);
+    }
+
+    public void remove(Emplayee emplayee){
+        this.emplayees.remove(emplayee);
+    }
+
+    public List<Emplayee> getChildren(){
+        return this.emplayees;
+    }
+
+    public String toString(){
+        return "Emplayee:[name:"+this.name+", phoneNum:"+this.phoneNum+"]";
+    }
+}
+~~~
+
+### 7.4 装饰模式
+
+> 动态地给一个对象添加或删除一个装饰的功能，用以**扩展功能**，相比继承更加的灵活，并且不改变现有代码
+>
+> 典型案例：java IO模块
+
+![MGfFt1.png](https://s2.ax1x.com/2019/11/13/MGfFt1.png)
+
+~~~java
+// 定义接口
+public interface Person {
+    void eat();
+}
+
+// 接口实现
+public class Man implements Person {
+    public void eat() {
+        System.out.println("男人在吃");
+    }
+}
+
+// 抽象的装饰类,子类在此基础上进行扩展
+public abstract class Decorator implements Person {
+    protected Person person;
+    public void setPerson(Person person) {
+        this.person = person;
+    }
+    public void eat(){
+        person.eat();
+    }
+}
+
+// 子类添加喝汤功能
+public class ManDecoratorA extends Decorator {
+    public void eat(){
+        super.eat();
+        drink();
+        System.out.println("ManDecoratroA类");
+    }
+
+    public void drink(){
+        System.out.println("男人喝蛋花汤");
+    }
+}
+
+// 子类去除喝汤功能
+public class ManDecoratorB extends Decorator {
+    public void eat(){
+        super.eat();
+        System.out.println("==========");
+        System.out.println("ManDecoratorB类");
+    }
+}
+~~~
+
+### 7.5 外观模式
+
+> 隐藏系统的复杂性，向客户端提供一个简单易用的访问接口
+
+![MGTbKP.png](https://s2.ax1x.com/2019/11/13/MGTbKP.png)
+
+~~~java
+// 定义CPU类
+public class CPU {
+    public void start(){
+        System.out.println("cpu启动");
+    }
+
+    public void shutDown(){
+        System.out.println("cpu关闭");
+    }
+}
+
+// 定义硬盘类
+public class Disk {
+    public void start(){
+        System.out.println("disk启动");
+    }
+
+    public void shutDown(){
+        System.out.println("disk关闭");
+    }
+}
+
+// 定义内存类
+public class Memory {
+    public void start(){
+        System.out.println("memory启动");
+    }
+
+    public void shutDown(){
+        System.out.println("memory关闭");
+    }
+}
+
+// 定义电脑类
+public class Computer {
+    private CPU cpu;
+    private Disk disk;
+    private Memory memory;
+    public Computer(){
+        cpu = new CPU();
+        disk = new Disk();
+        memory = new Memory();
+    }
+
+    public void start(){
+        System.out.println("电脑开始启动");
+        cpu.start();
+        disk.start();
+        memory.start();
+        System.out.println("电脑启动完成");
+    }
+
+    public void shutDown(){
+        System.out.println("电脑开始关机");
+        cpu.shutDown();
+        disk.shutDown();
+        memory.shutDown();
+        System.out.println("电脑关机完成");
+    }
+}
+
+//  客户端调用
+public class Client {
+    public static void main(String[] args) {
+        Computer computer = new Computer();
+        computer.start();
+        System.out.println("===电脑使用完毕===");
+        computer.shutDown();
+    }
+}
+~~~
+
+### 7.6 享元模式
+
+> 同一对象实例的重复使用
+
+![MGOv5T.png](https://s2.ax1x.com/2019/11/13/MGOv5T.png)
+
+~~~java
+// 定义接口
+public interface FlyWeight {
+    void action();
+}
+
+// 接口子类实现
+public class ChildFlyWeight implements FlyWeight {
+    public void action() {
+        System.out.println("享元模式");
+    }
+}
+
+//  享元工厂，享元模式的核心
+public class FlyWeightFactory {
+    // 对象存放容器
+    private static ConcurrentHashMap<String,FlyWeight> map = new ConcurrentHashMap<String, FlyWeight>();
+
+    public static FlyWeight getFlyWeight(String name){
+        if (map.get(name) == null) {
+            synchronized (map) {
+                if (map.get(name) == null) {
+                    ChildFlyWeight childFlyWeight = new ChildFlyWeight();
+                    map.put(name,childFlyWeight);
+                }
+            }
+        }
+        return map.get(name);
+    }
+}
+~~~
+
+### 7.7 代理模式
+
+> 代理对象替代真实对象完成用户的请求
+
+#### 7.7.1 静态代理
+
+> 代理对象持有真实对象的引用，**代理类和真实类实现共同的接口**
+
+![MJFk59.png](https://s2.ax1x.com/2019/11/13/MJFk59.png)
+
+~~~java
+// 定义接口
+public interface Movie {
+    void play();
+}
+
+// 接口实现
+public class RealMovie implements Movie {
+    public void play() {
+        System.out.println("观看电影《当幸福来敲门》");
+    }
+}
+
+// 代理类
+public class ProxyMovie implements Movie {
+    // 持有真实对象的引用
+    RealMovie realMovie;
+    public ProxyMovie(RealMovie realMovie) {
+        this.realMovie = realMovie;
+    }
+    public void play() {
+        slogan(true);
+        realMovie.play();
+        slogan(false);
+    }
+    private void slogan(boolean isStart){
+        if (isStart) {
+            System.out.println("电影即将开始,请关闭手机");
+        } else {
+            System.out.println("电影即将结束,请有序离场");
+        }
+    }
+}
+
+// 调用
+public class Client {
+    public static void main(String[] args) {
+        RealMovie realMovie = new RealMovie();
+        ProxyMovie proxyMovie = new ProxyMovie(realMovie);
+        proxyMovie.play();
+    }
+}
+~~~
+
+#### 7.7.2动态代理
+
+##### 7.7.2.1 JDK动态代理
+
+> JDK动态代理的代理对象在创建时，需要使用业务实现类所实现的接口（即Movie）作为参数，没有接口则无法使用
+
+![MJe1IS.png](https://s2.ax1x.com/2019/11/13/MJe1IS.png)
+
+~~~java
+// 定义接口
+public interface Movie {
+    void play();
+}
+
+// 接口实现
+public class RealMovie implements Movie {
+    public void play() {
+        System.out.println("观看电影《当幸福来敲门》");
+    }
+}
+
+// 代理类,要实现invocationHandler
+public class ProxyMovie implements InvocationHandler {
+    Movie movie;
+    public ProxyMovie(Movie movie){
+        this.movie = movie;
+    }
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        System.out.println("电影即将开始,请坐好");
+        method.invoke(movie,args);
+        System.out.println("电影即将结束,请起立");
+        return null;
+    }
+}
+
+// 使用
+public class Client {
+    public static void main(String[] args) {
+        RealMovie realMovie = new RealMovie();
+        ProxyMovie proxyMovie = new ProxyMovie(realMovie);
+        // 通过Proxy获取代理实例
+        Movie proxyInstance = (Movie) Proxy.newProxyInstance(RealMovie.class.getClassLoader(), RealMovie.class.getInterfaces(), proxyMovie);
+        proxyInstance.play();
+
+    }
+}
+~~~
+
+##### 7.7.2.2 CGLIB动态代理
+
+> 针对类来实现代理，原理是**对指定的业务类生成一个子类，并覆盖其中业务方法**。因采取的是继承，所以不能对final修饰的类进行代理
+
+~~~xml
+<!-- 导入依赖 -->
+<dependency>
+    <groupId>cglib</groupId>
+    <artifactId>cglib</artifactId>
+    <version>3.3.0</version>
+</dependency>
+~~~
+
+~~~java
+// 定义类
+public class RealMovie {
+    public void play() {
+        System.out.println("观看电影《当幸福来敲门》");
+    }
+}
+
+// 定义代理类
+public class ProxyMovie implements MethodInterceptor {
+    Object object;
+
+    public Object getInstance(Object object) {
+        this.object = object;
+        // 用来创建动态代理类
+        Enhancer enhancer = new Enhancer();
+        // 设置超类
+        enhancer.setSuperclass(this.object.getClass());
+        // 设置回调
+        enhancer.setCallback(this);
+        // 返回创建的代理类
+        return enhancer.create();
+    }
+
+    @Override
+    public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
+        System.out.println("电影即将开始，请坐好");
+        // 调用父类方法
+        methodProxy.invokeSuper(o, objects);
+        System.out.println("电影即将结束，请起立");
+        return null;
+
+    }
+}
+~~~
+
+### 7.8 总结
+
+> `代理模式`：方法的增强
+>
+> `装饰者模式`：类的增强
+>
+> `适配器模式`：基于旧类获取需要的新类
+>
+> `桥接模式`：抽象化与实现化的解耦
+>
+> `门面模式`：化繁为简，供客户使用
+>
+> `组合模式`：针对具有层次结构的数据
+>
+> `享元模式`：对象缓存，避免重复创建
